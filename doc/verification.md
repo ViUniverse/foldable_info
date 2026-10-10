@@ -1,6 +1,6 @@
 # Verified coverage
 
-Release candidate: 0.1.0. Native Android angles are outside this release.
+Release candidate: 0.1.1. Native Android angles are outside this release.
 
 The first iOS implementation was exercised on the Duo iOS 27.1 simulator and
 an iPad Pro 11-inch M5 simulator running iOS 26.2. Duo tests included several fold
@@ -37,3 +37,11 @@ A dry run does not upload the package or reserve its name. The web build produce
 a Flutter icon-font warning for the optional Cupertino icon family; the example
 uses Material widgets and its build completed. CI outcomes are separate from
 these local results.
+
+## Minimum Flutter constraint correction
+
+The first GitHub run passed stable Dart checks but Flutter 3.38.0 failed dependency
+resolution: that stable Flutter release contains Dart 3.10.0-290.4.beta, which
+`^3.10.0` excludes. Version 0.1.1 includes that exact shipped minimum SDK. This
+changes SDK compatibility only; native source and the measurement API are unchanged.
+The 0.1.0 pub.dev upload succeeded before this CI result was finalized.

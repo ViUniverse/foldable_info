@@ -1,6 +1,6 @@
 name: foldable_info
 description: Fold, angle and view information for Flutter through direct reads and streams.
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/ViUniverse/foldable_info
 repository: https://github.com/ViUniverse/foldable_info
 issue_tracker: https://github.com/ViUniverse/foldable_info/issues
@@ -17,7 +17,7 @@ platforms:
   web:
   windows:
 environment:
-  sdk: ^3.10.0
+  sdk: '>=3.10.0-290.4.beta <4.0.0'
   flutter: '>=3.38.0'
 dependencies:
   flutter:

@@ -3,7 +3,7 @@
 Read fold state, hinge angle, view size and blocked areas in Flutter. Your app
 or design system decides how to arrange content; this package supplies data.
 
-**0.1.0 is an early iOS release.** The iOS bridge reads public UIKit APIs when
+**0.1.x is an early iOS release.** The iOS bridge reads public UIKit APIs when
 available. Android and other platforms use Flutter view metrics and display
 features only; **native Android hinge angles are not implemented**.
 The new Apple hinge/reserved-region APIs are currently documented as beta and
@@ -16,7 +16,8 @@ flutter pub add foldable_info
 ```
 
 For the source checkout, use a Git or local path dependency until the first
-pub.dev upload completes. Dart 3.10+ and Flutter 3.38+ are required. iOS deployment
+pub.dev upload completes. Dart 3.10+ and Flutter 3.38+ are required. The SDK range also includes the
+Dart 3.10 beta bundled with Flutter 3.38.0. iOS deployment
 target: 15.0+. New fold APIs need a supporting OS and device/view hierarchy.
 There are no extra permissions, provider dependency or design-system dependency.
 

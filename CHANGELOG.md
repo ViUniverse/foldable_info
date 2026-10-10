@@ -1,3 +1,8 @@
+## 0.1.1
+
+- Accept the Dart 3.10 beta bundled with Flutter 3.38.0, matching the declared
+  Flutter minimum. No native behavior or public measurement API changed.
+
 ## 0.1.0
 
 Initial public release, focused on iOS.

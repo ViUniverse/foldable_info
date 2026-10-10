@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'foldable_info'
-  s.version = '0.1.0'
+  s.version = '0.1.1'
   s.summary = 'Native fold, angle and view information for Flutter.'
   s.description = s.summary
   s.homepage = 'https://github.com/ViUniverse/foldable_info'
