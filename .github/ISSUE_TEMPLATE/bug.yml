@@ -1,0 +1,23 @@
+name: Bug report
+description: Report a measurement, stream or integration issue.
+body:
+  - type: textarea
+    attributes:
+      label: Expected and actual result
+      description: Include a small reproducible example and relevant data states.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Flutter and Dart versions
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Platform, OS version, device or simulator
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: View setup and logs
+      description: Mention SafeArea, transforms, multiple views, app lifecycle or keyboard. Remove personal information from logs.

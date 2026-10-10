@@ -1,0 +1,20 @@
+name: foldable_info_example
+description: Display fold, angle and view information using only foldable_info.
+version: 1.0.0+1
+publish_to: none
+environment:
+  sdk: ^3.10.0
+  flutter: '>=3.38.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  foldable_info:
+    path: ../
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+flutter:
+  uses-material-design: true

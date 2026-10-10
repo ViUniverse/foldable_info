@@ -1,0 +1,48 @@
+name: Check package
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dart:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flutter: ['3.38.0', 'stable']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter != 'stable' && matrix.flutter || '' }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed lib test example/lib example/test example/integration_test
+        if: matrix.flutter == 'stable'
+      - run: flutter analyze
+      - run: flutter test
+      - run: flutter pub get
+        working-directory: example
+      - run: flutter test
+        working-directory: example
+      - run: flutter build web --release
+        working-directory: example
+      - run: flutter pub publish --dry-run
+        if: matrix.flutter == 'stable'
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter pub get
+        working-directory: example
+      - run: flutter build ios --simulator --debug --no-codesign
+        working-directory: example
