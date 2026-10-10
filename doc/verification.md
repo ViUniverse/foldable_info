@@ -10,9 +10,13 @@ UIKit container. UIKit toolbar enumeration and physical screen identity are not
 features of this release.
 
 Toolchain available for the release check: Flutter 3.47.6, Dart 3.13.5, Xcode 27.1.
-The declared minimum is Flutter 3.38 / Dart language 3.9 / iOS 15. CI includes Dart checks
-on Flutter 3.38 and stable, but a configuration is not evidence of a completed run.
-Older SDK builds, iOS 15 and physical device tests remain unverified.
+The declared minimum is Flutter 3.38 / Dart language 3.9 / iOS 15. GitHub CI has
+passed analysis, plugin/example tests and a web build on Flutter 3.38.0, plus an
+iOS simulator build on stable. The minimum-version result is recorded in
+[this CI job](https://github.com/ViUniverse/foldable_info/actions/runs/38078839087/job/114291373343).
+That run also exposed a prerelease SDK publication warning, corrected by the
+stable Dart language constraint below. iOS builds on the minimum Flutter SDK,
+iOS 15 and physical device tests remain unverified.
 
 ## Standalone release checks
 
