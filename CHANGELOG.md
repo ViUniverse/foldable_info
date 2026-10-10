@@ -1,7 +1,8 @@
 ## 0.1.1
 
-- Accept the Dart 3.10 beta bundled with Flutter 3.38.0, matching the declared
-  Flutter minimum. No native behavior or public measurement API changed.
+- Use Dart language 3.9 while keeping Flutter 3.38 as the minimum. This also
+  accepts the Dart 3.10 beta bundled with Flutter 3.38.0 without a prerelease
+  SDK constraint. No native behavior or public measurement API changed.
 
 ## 0.1.0
 

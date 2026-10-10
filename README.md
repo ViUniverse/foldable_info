@@ -16,8 +16,8 @@ flutter pub add foldable_info
 ```
 
 For the source checkout, use a Git or local path dependency until the first
-pub.dev upload completes. Dart 3.10+ and Flutter 3.38+ are required. The SDK range also includes the
-Dart 3.10 beta bundled with Flutter 3.38.0. iOS deployment
+pub.dev upload completes. Flutter 3.38+ is required. The Dart language minimum is 3.9, so the
+Dart 3.10 beta bundled with Flutter 3.38.0 is also accepted. iOS deployment
 target: 15.0+. New fold APIs need a supporting OS and device/view hierarchy.
 There are no extra permissions, provider dependency or design-system dependency.
 

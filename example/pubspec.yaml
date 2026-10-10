@@ -3,7 +3,7 @@ description: Display fold, angle and view information using only foldable_info.
 version: 1.0.0+1
 publish_to: none
 environment:
-  sdk: '>=3.10.0-290.4.beta <4.0.0'
+  sdk: ^3.9.0
   flutter: '>=3.38.0'
 dependencies:
   flutter:

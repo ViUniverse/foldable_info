@@ -10,7 +10,7 @@ UIKit container. UIKit toolbar enumeration and physical screen identity are not
 features of this release.
 
 Toolchain available for the release check: Flutter 3.47.6, Dart 3.13.5, Xcode 27.1.
-The declared minimum is Flutter 3.38 / Dart 3.10 / iOS 15. CI includes Dart checks
+The declared minimum is Flutter 3.38 / Dart language 3.9 / iOS 15. CI includes Dart checks
 on Flutter 3.38 and stable, but a configuration is not evidence of a completed run.
 Older SDK builds, iOS 15 and physical device tests remain unverified.
 
@@ -42,6 +42,7 @@ these local results.
 
 The first GitHub run passed stable Dart checks but Flutter 3.38.0 failed dependency
 resolution: that stable Flutter release contains Dart 3.10.0-290.4.beta, which
-`^3.10.0` excludes. Version 0.1.1 includes that exact shipped minimum SDK. This
+`^3.10.0` excludes. Version 0.1.1 uses Dart language 3.9 and keeps the Flutter 3.38 minimum,
+so the bundled SDK is accepted without requiring a prerelease Dart SDK. This
 changes SDK compatibility only; native source and the measurement API are unchanged.
 The 0.1.0 pub.dev upload succeeded before this CI result was finalized.
