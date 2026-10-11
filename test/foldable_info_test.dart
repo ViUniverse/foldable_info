@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foldable_info/foldable_info.dart';
-import 'package:foldable_info/src/service.dart' show ReplayFeed, viewInfo;
+import 'package:foldable_info/src/replay_feed.dart';
+import 'package:foldable_info/src/view_metrics.dart';
+import 'package:foldable_info/src/layout_comparison.dart';
 import 'package:foldable_info/src/wire.dart';
 
 final time = DateTime.utc(2026, 10, 10);
@@ -79,7 +81,7 @@ void main() {
     final angles = await FoldableInfo.readAngles();
     expect(angles.viewId, t.view.viewId);
     expect(angles.angles.state, DataState.notSupported);
-  });
+  }, variant: TargetPlatformVariant({TargetPlatform.linux}));
   testWidgets('invalid area group preserves valid view and hinge data', (
     t,
   ) async {
@@ -242,7 +244,7 @@ void main() {
       expect(a.extraSpace!.left, 20);
       expect(a.isActive, false);
       final later = decodeData(r, t.view, false);
-      expect(semanticData(later), semanticData(decodeData(r, t.view, false)));
+      expect(sameLayout(later, decodeData(r, t.view, false)), true);
       expect(
         () => checkWire({...r, 'version': 2}, t.view.viewId),
         throwsA(isA<FoldableError>()),
@@ -253,58 +255,64 @@ void main() {
       );
     },
   );
-  testWidgets(
-    'projection handles offset, scale, zero-width lines and margins',
-    (t) async {
-      t.view.physicalSize = const Size(400, 400);
-      t.view.devicePixelRatio = 1;
-      addTearDown(t.view.resetPhysicalSize);
-      addTearDown(t.view.resetDevicePixelRatio);
-      final key = GlobalKey();
-      await t.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 50, top: 30),
-              child: Transform.scale(
-                scale: 2,
-                alignment: Alignment.topLeft,
-                child: SizedBox(key: key, width: 100, height: 100),
+  for (final ratio in [1.0, 3.0]) {
+    testWidgets(
+      'projection preserves logical coordinates at pixel ratio $ratio',
+      (t) async {
+        t.view.physicalSize = const Size(400, 400) * ratio;
+        t.view.devicePixelRatio = ratio;
+        addTearDown(t.view.resetPhysicalSize);
+        addTearDown(t.view.resetDevicePixelRatio);
+        final key = GlobalKey();
+        await t.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 50, top: 30),
+                child: Transform.scale(
+                  scale: 2,
+                  alignment: Alignment.topLeft,
+                  child: SizedBox(key: key, width: 100, height: 100),
+                ),
               ),
             ),
           ),
-        ),
-      );
-      final box = key.currentContext!.findRenderObject()! as RenderBox;
-      final data = fixture(
-        t.view,
-        areas: [
-          area(const Rect.fromLTWH(150, 30, 0, 200)),
-          area(
-            const Rect.fromLTWH(50, 30, 40, 200),
-            extra: const EdgeInsets.all(20),
-          ),
-          area(const Rect.fromLTWH(350, 0, 10, 10)),
-        ],
-      );
-      final local = FoldableSpace.toBox(data: data, target: box, view: t.view);
-      expect(local.state, LocalState.ready);
-      expect(local.areas.length, 2);
-      expect(local.areas.first.rect, const Rect.fromLTWH(50, 0, 0, 100));
-      expect(local.areas[1].rect.width, 20);
-      expect(local.areas[1].extraSpace!.left, 10);
-      expect(
-        () => FoldableSpace.toBox(
-          data: data.copyWith(viewId: 99),
+        );
+        final box = key.currentContext!.findRenderObject()! as RenderBox;
+        final data = fixture(
+          t.view,
+          areas: [
+            area(const Rect.fromLTWH(150, 30, 0, 200)),
+            area(
+              const Rect.fromLTWH(50, 30, 40, 200),
+              extra: const EdgeInsets.all(20),
+            ),
+            area(const Rect.fromLTWH(350, 0, 10, 10)),
+          ],
+        );
+        final local = FoldableSpace.toBox(
+          data: data,
           target: box,
           view: t.view,
-        ),
-        throwsArgumentError,
-      );
-    },
-  );
+        );
+        expect(local.state, LocalState.ready);
+        expect(local.areas.length, 2);
+        expect(local.areas.first.rect, const Rect.fromLTWH(50, 0, 0, 100));
+        expect(local.areas[1].rect.width, 20);
+        expect(local.areas[1].extraSpace!.left, 10);
+        expect(
+          () => FoldableSpace.toBox(
+            data: data.copyWith(viewId: 99),
+            target: box,
+            view: t.view,
+          ),
+          throwsArgumentError,
+        );
+      },
+    );
+  }
   testWidgets('projection rejects skew/reflection and stale size', (t) async {
     final key = GlobalKey();
     await t.pumpWidget(
@@ -345,7 +353,7 @@ void main() {
     final resized = await handle.read();
     expect(resized.revision, first.revision + 1);
     expect((await handle.read()).revision, resized.revision);
-  });
+  }, variant: TargetPlatformVariant({TargetPlatform.linux}));
   testWidgets('native reads fail clearly and streams reject old snapshots', (
     t,
   ) async {

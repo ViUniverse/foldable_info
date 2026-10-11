@@ -22,3 +22,17 @@ example/ios/Flutter/Flutter.podspec
 example/ios/Runner/GeneratedPluginRegistrant.h
 example/ios/Runner/GeneratedPluginRegistrant.m
 **/xcuserdata/
+
+**/.gradle/
+**/local.properties
+**/gradlew
+**/gradlew.bat
+**/gradle-wrapper.jar
+**/captures/
+**/key.properties
+
+**/GeneratedPluginRegistrant.java
+**/.cxx/
+**/.kotlin/
+**/*.keystore
+**/*.jks

@@ -1,0 +1,25 @@
+group = 'dev.viuniverse.foldable_info'
+version = '1.0'
+
+buildscript {
+    repositories { google(); mavenCentral() }
+    dependencies { classpath 'com.android.tools.build:gradle:8.11.1' }
+}
+apply plugin: 'com.android.library'
+
+android {
+    namespace 'dev.viuniverse.foldable_info'
+    compileSdk 36
+    defaultConfig { minSdk 24 }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    testOptions { unitTests.returnDefaultValues = true }
+}
+repositories { google(); mavenCentral() }
+dependencies {
+    implementation 'androidx.window:window-java:1.5.1'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:5.0.0'
+}
