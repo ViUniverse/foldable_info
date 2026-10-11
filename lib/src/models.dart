@@ -29,7 +29,7 @@ enum DataSource {
   /// Public UIKit APIs.
   ios,
 
-  /// Reserved for a future native Android bridge.
+  /// Jetpack WindowManager or the Android hinge-angle sensor.
   android,
 
   /// A value calculated from other measurements.

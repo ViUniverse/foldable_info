@@ -1,3 +1,14 @@
+## Unreleased
+
+- Add an Activity-aware native Android bridge using Jetpack WindowManager 1.5.1.
+- Read fold geometry, orientation, occlusion, separation and native posture.
+- Read/watch the default hinge-angle sensor independently on API 30+ when present.
+- Translate window frames into engine-view logical pixels; preserve fold lines.
+- Stop sensors in the background and release observation when demand ends.
+- Rebind on Activity recreation; reject late callbacks from old activities.
+- Keep Flutter cutouts and explicitly report unknown hardware/unsupported angles.
+- Add an Android runner, native geometry tests, decoder tests and Android CI.
+
 ## 0.1.1
 
 - Use Dart language 3.9 while keeping Flutter 3.38 as the minimum. This also

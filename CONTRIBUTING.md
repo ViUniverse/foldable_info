@@ -11,7 +11,9 @@ boundaries. Document platform limitations instead of guessing missing values.
 
 Before a pull request, run `dart format --output=none --set-exit-if-changed lib test example/lib example/test example/integration_test`,
 `flutter analyze`, `flutter test`, and the example tests. Native changes also
-need `flutter test integration_test/native_test.dart -d <ios-device>` from example.
+need `flutter test integration_test/native_test.dart -d <device>` from example
+on the changed platform. For Android, also build the example APK and run
+`./gradlew :foldable_info:testDebugUnitTest` from `example/android` (JDK 17).
 Include the results and untested platforms in the pull request.
 
 Contributions are distributed under the project's MIT license. Do not copy code

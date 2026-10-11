@@ -11,3 +11,17 @@
 .idea/
 *.iml
 *.log
+
+**/.gradle/
+**/local.properties
+**/gradlew
+**/gradlew.bat
+**/gradle-wrapper.jar
+**/captures/
+**/key.properties
+
+**/GeneratedPluginRegistrant.java
+**/.cxx/
+**/.kotlin/
+**/*.keystore
+**/*.jks

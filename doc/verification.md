@@ -1,6 +1,7 @@
 # Verified coverage
 
-Release candidate: 0.1.1. Native Android angles are outside this release.
+Published release: 0.1.1 (iOS-first). The Android results below describe the
+new development branch, not the hosted 0.1.1 archive.
 
 The first iOS implementation was exercised on the Duo iOS 27.1 simulator and
 an iPad Pro 11-inch M5 simulator running iOS 26.2. Duo tests included several fold
@@ -50,3 +51,37 @@ resolution: that stable Flutter release contains Dart 3.10.0-290.4.beta, which
 so the bundled SDK is accepted without requiring a prerelease Dart SDK. This
 changes SDK compatibility only; native source and the measurement API are unchanged.
 The 0.1.0 pub.dev upload succeeded before this CI result was finalized.
+
+## Native Android development checks
+
+Checked on 2026-10-11 with Flutter 3.47.6 / Dart 3.13.5, Temurin JDK 17,
+AGP 8.11.1, Gradle 8.14.3, and a Pixel 10 Pro Fold emulator on Android API 37.
+No machine-specific Java or Android SDK path is committed.
+
+| Check | Result |
+| --- | --- |
+| Plugin Dart tests | 22 passed, including Android decoding and direct methods |
+| Example widget test | 1 passed |
+| Native Java tests | 9 passed: clipping/offset/density, zero-width fold lines, sensor absence/failure, cancellation/timeout, background and detach |
+| Android debug APK | Built and installed |
+| Live Android example and hot reload | Passed |
+| Half-open native integration | 2 passed; `partlyOpen`, angle 90°, fold line plus separate Flutter cutout |
+| Flat native integration | 2 passed; `open`, angle 180° |
+| iPhone Duo iOS regression | 2 passed after the shared Dart bridge changes |
+
+Both Android runs checked shared subscribers, cancellation, new observation
+sessions, invalid view IDs, recovery and mounting/unmounting the example.
+Posture and angle were asserted independently against explicitly controlled
+emulator inputs. The fold line was x=425.8 in a view of 851.7 × 882.9 logical pixels.
+
+The closed/cover-display attempt did not pass the foreground integration suite:
+the emulator switched both displays off and paused the Activity. The suite's
+ready-data assertions then failed. It is not evidence that cover-display
+foreground behavior works; that case remains unverified. Geometry readiness,
+background cleanup and sensor stop/restart are tested separately as listed above.
+
+Physical Android devices, a live Split View resize, multiple hinges, and Android
+API 24–36 runtime behavior remain unverified. Android build checks are also added
+to CI for Flutter 3.38.0 and stable; a configured job is not itself a passing
+result. The example toolchain intentionally remains on AGP/Gradle 8 for the
+minimum Flutter SDK; current Flutter reports future-support deprecation warnings.

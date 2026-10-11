@@ -3,9 +3,10 @@
 Read fold state, hinge angle, view size and blocked areas in Flutter. Your app
 or design system decides how to arrange content; this package supplies data.
 
-**0.1.x is an early iOS release.** The iOS bridge reads public UIKit APIs when
-available. Android and other platforms use Flutter view metrics and display
-features only; **native Android hinge angles are not implemented**.
+**The next release adds native Android support.** Android reads Jetpack
+WindowManager fold features and the hinge-angle sensor when present. The iOS
+bridge reads public UIKit APIs when available. Web and desktop use Flutter view
+metrics and display features. The published 0.1.1 release is still iOS-first.
 The new Apple hinge/reserved-region APIs are currently documented as beta and
 may change. Missing data is reported explicitly, not guessed.
 
@@ -42,8 +43,9 @@ final handle = FoldableInfo.instance.forView(View.of(context));
 final data = await handle.read();
 ```
 
-Import `package:flutter/widgets.dart` for `View`. Native iOS currently supports
-the engine registrar's view (Flutter view ID 0); another view reports `noView`.
+Import `package:flutter/widgets.dart` for `View`. Native Android/iOS currently support
+the engine's attached view (Flutter view ID 0); another view reports `noView`.
+Android also needs an attached Activity. Activity recreation is handled automatically.
 The service never chooses an arbitrary native window. Engines have independent
 services. Static methods report `noView` when no implicit Flutter view exists.
 
@@ -153,15 +155,15 @@ snapshot. iOS reserved frames already include the reported margins; do not add
 | Data | iOS | Android | Web / desktop |
 | --- | --- | --- | --- |
 | View size, safe padding, keyboard/gesture insets | Flutter | Flutter | Flutter |
-| Fold/blocked areas | UIKit reserved regions when available | Flutter `displayFeatures` | Flutter `displayFeatures`, often empty |
-| Fold state | UIKit hinge status when available | Flutter display-feature posture | Usually unavailable |
-| Hinge angle | UIKit hinge angle when available | **Not supported in 0.1.0** | Not supported |
+| Fold/blocked areas | UIKit reserved regions when available | Native WindowManager folds + Flutter cutouts | Flutter `displayFeatures`, often empty |
+| Fold state | UIKit hinge status when available | Native `FLAT` / `HALF_OPENED` | Usually unavailable |
+| Hinge angle | UIKit hinge angle when available | `TYPE_HINGE_ANGLE` on API 30+ with a sensor | Not supported |
 | Size classes, native safe area, preferred bar side | UIKit | Not supported | Not supported |
 
-Flutter decides which display features a platform delivers. This release has no
-Android native bridge, `SensorManager` or direct Jetpack WindowManager dependency.
-The platform labels include Flutter fallback support; they do not claim native
-fold hardware support on every platform.
+Android requires API 24 or newer. Hinge angles require API 30+ and a sensor;
+there are no additional permissions. WindowManager depends on vendor support.
+An empty feature list does not prove that the device cannot fold. Web/desktop
+labels describe Flutter fallback support, not native fold hardware detection.
 
 The iOS bridge uses public
 [UIHingeInteraction](https://developer.apple.com/documentation/uikit/uihingeinteraction)
@@ -174,10 +176,13 @@ classes and safe area. Resolve `BarSide.start/end` using your widget's
 - Does not enumerate every UIKit toolbar, app overlay, floating/split keyboard,
   rounded corner or design spacing. Add app-owned obstacles in your layout layer.
 - No physical-screen identity, six named device poses or hardware model detection.
-- iOS native multi-view support beyond the registrar view is not implemented.
+- Native Android/iOS multi-view support beyond the attached engine view is not implemented.
+- Android observes the default hinge sensor, without assigning it to a fold ID.
+  Angle-only changes do not alter layout state; sensor precision and availability
+  depend on the device.
 - No layout placement, navigation, overflow decisions or animation.
 - Minimum-version declarations are not a complete tested device/SDK matrix.
-  See [verified coverage](doc/verification.md) and [native details](doc/native-ios.md).
+  See [verified coverage](doc/verification.md) and [iOS details](doc/native-ios.md) and [Android details](doc/native-android.md).
 
 ## Test and contribute
 

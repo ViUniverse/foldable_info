@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -21,7 +22,23 @@ void main() {
     final data = await FoldableInfo.read();
     expect(data.viewState, ViewState.ready);
     expect(data.view.value!.size, view.physicalSize / view.devicePixelRatio);
-    expect(data.ios.isReady, true);
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      expect(data.ios.state, DataState.notSupported);
+      expect(data.areas.isReady, true);
+      expect(data.folds.isReady, true);
+      for (final fold in data.folds.value!) {
+        expect(fold.openState.source, DataSource.android);
+      }
+    } else {
+      expect(data.ios.isReady, true);
+    }
+    const expectedPosture = String.fromEnvironment('EXPECTED_POSTURE');
+    if (expectedPosture == 'none') {
+      expect(data.folds.value, isEmpty);
+    } else if (expectedPosture.isNotEmpty) {
+      expect(data.folds.value, isNotEmpty);
+      expect(data.folds.value!.single.openState.value?.name, expectedPosture);
+    }
     final samples = <FoldableData>[];
     final first = FoldableInfo.watch().listen(samples.add);
     final second = handle.watch().listen((_) {});
@@ -49,6 +66,14 @@ void main() {
         ]),
       );
     }
+    const expectedAngle = String.fromEnvironment('EXPECTED_ANGLE');
+    if (expectedAngle.isNotEmpty) {
+      expect(angles.angles.isReady, true);
+      expect(
+        angles.angles.value!.single.degrees,
+        closeTo(double.parse(expectedAngle), .1),
+      );
+    }
     await angleSubscription.cancel();
     expect((await FoldableInfo.read()).sessionId, shared.sessionId);
     await second.cancel();
@@ -66,7 +91,7 @@ void main() {
     final recovery = await handle.read();
     expect(recovery.viewState, ViewState.ready);
     debugPrint(
-      'NATIVE_CHECK size=${recovery.view.value!.size} areas=${recovery.areas.state.name} folds=${recovery.folds.state.name} angle=${angles.angles.state.name} sessionChanges=true',
+      'NATIVE_CHECK size=${recovery.view.value!.size} areas=${recovery.areas.state.name} folds=${recovery.folds.state.name} angle=${angles.angles.state.name} degrees=${angles.angles.value?.map((a) => a.degrees).toList()} posture=${recovery.folds.value?.map((f) => f.openState.value?.name).toList()} regions=${recovery.areas.value?.map((a) => a.rect).toList()} sessionChanges=true',
     );
   });
   testWidgets('example can mount, watch angles and unmount', (tester) async {

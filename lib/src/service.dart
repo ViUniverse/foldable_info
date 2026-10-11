@@ -44,7 +44,7 @@ abstract class FoldableInfo {
   }
 
   /// Returns the shared handle for [view]. No subscription starts yet.
-  /// iOS supports only its registrar view; other native view IDs report noView.
+  /// Native Android/iOS support only their engine view; other IDs report noView.
   FoldableView forView(ui.FlutterView view);
 }
 
@@ -208,6 +208,8 @@ class _NativeView extends FoldableView with WidgetsBindingObserver {
   static const _layoutChannel = EventChannel('foldable_info/layout');
   static const _angleChannel = EventChannel('foldable_info/angles');
   bool get _ios => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+  bool get _native =>
+      _ios || (!kIsWeb && defaultTargetPlatform == TargetPlatform.android);
   late final ReplayFeed<FoldableData> layout;
   late final ReplayFeed<FoldAngles> angles;
   StreamSubscription<Object?>? _layoutSub, _angleSub;
@@ -241,18 +243,18 @@ class _NativeView extends FoldableView with WidgetsBindingObserver {
   }
 
   void _start(bool angle) {
-    if (_ios && viewId != 0) {
+    if (_native && viewId != 0) {
       _fail(
         angle,
         const FoldableError(
           ErrorCode.noView,
-          'This iOS engine supports only its registrar view (view 0).',
+          'This native engine supports only its attached view (view 0).',
         ),
       );
       return;
     }
     _observe();
-    if (!_ios) {
+    if (!_native) {
       if (angle) {
         angles.add(
           initialAngles(view).copyWith(angles: DataValue.notSupported()),
@@ -390,12 +392,15 @@ class _NativeView extends FoldableView with WidgetsBindingObserver {
   }) async {
     if (timeout <= Duration.zero) throw ArgumentError.value(timeout, 'timeout');
     if (_removed) return layout.latest;
-    if (!_ios) {
+    if (!_native) {
       _publishFallback();
       return layout.latest;
     }
     if (viewId != 0) {
-      throw const FoldableError(ErrorCode.noView, 'Unsupported iOS view ID.');
+      throw const FoldableError(
+        ErrorCode.noView,
+        'Unsupported native view ID.',
+      );
     }
     final raw = await _call('read', timeout);
     try {
@@ -412,12 +417,15 @@ class _NativeView extends FoldableView with WidgetsBindingObserver {
   }) async {
     if (timeout <= Duration.zero) throw ArgumentError.value(timeout, 'timeout');
     if (_removed) return angles.latest;
-    if (!_ios) {
+    if (!_native) {
       return initialAngles(view).copyWith(angles: DataValue.notSupported());
     }
     try {
       if (viewId != 0) {
-        throw const FoldableError(ErrorCode.noView, 'Unsupported iOS view ID.');
+        throw const FoldableError(
+          ErrorCode.noView,
+          'Unsupported native view ID.',
+        );
       }
       _acceptAngles(await _call('readAngles', timeout));
       return angles.latest;
@@ -458,7 +466,7 @@ class _NativeView extends FoldableView with WidgetsBindingObserver {
       }
       if (_raw != null) {
         _accept(_raw!);
-      } else if (!_ios) {
+      } else if (!_native) {
         _publishFallback();
       }
     });
@@ -472,7 +480,7 @@ class _NativeView extends FoldableView with WidgetsBindingObserver {
         state == AppLifecycleState.detached;
     if (_raw != null) {
       _accept(_raw!);
-    } else if (!_ios) {
+    } else if (!_native) {
       _publishFallback();
     }
     if (_paused) {

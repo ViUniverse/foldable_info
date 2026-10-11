@@ -72,6 +72,7 @@ FoldableData decodeData(
   ui.FlutterView view,
   bool paused,
 ) {
+  if (raw['platform'] == 'android') return decodeAndroidData(raw, view, paused);
   final now = DateTime.now().toUtc();
   DataValue<T> ready<T>(T value) =>
       DataValue.ready(value, source: DataSource.ios, readAt: now);
@@ -221,20 +222,23 @@ FoldableData decodeData(
 }
 
 FoldAngles decodeAngles(Map<Object?, Object?> raw, bool paused) {
+  final source = raw['platform'] == 'android'
+      ? DataSource.android
+      : DataSource.ios;
   final DataValue<List<FoldAngle>> value;
   if (paused || raw['paused'] == true || raw['attached'] != true) {
-    value = DataValue.notAvailable(source: DataSource.ios);
+    value = DataValue.notAvailable(source: source);
   } else {
     value = switch (raw['state']) {
       'ready' => DataValue.ready(
         [FoldAngle(degrees: _number(raw['degrees']))],
-        source: DataSource.ios,
+        source: source,
         readAt: DateTime.now().toUtc(),
       ),
-      'loading' => DataValue.loading(source: DataSource.ios),
-      'notSupported' => DataValue.notSupported(source: DataSource.ios),
-      'notAvailable' => DataValue.notAvailable(source: DataSource.ios),
-      _ => DataValue.unknown(source: DataSource.ios),
+      'loading' => DataValue.loading(source: source),
+      'notSupported' => DataValue.notSupported(source: source),
+      'notAvailable' => DataValue.notAvailable(source: source),
+      _ => DataValue.unknown(source: source),
     };
   }
   return FoldAngles(
@@ -334,4 +338,112 @@ class _Semantic extends InfoModel {
   const _Semantic(this.fields);
   @override
   final List<Object?> fields;
+}
+
+FoldableData decodeAndroidData(
+  Map<Object?, Object?> raw,
+  ui.FlutterView view,
+  bool paused,
+) {
+  final now = DateTime.now().toUtc();
+  DataValue<T> ready<T>(T value) =>
+      DataValue.ready(value, source: DataSource.android, readAt: now);
+  final metrics = viewInfo(view);
+  final attached = raw['attached'] == true;
+  final available = attached && !paused && raw['paused'] != true;
+  final size = wireMap(raw['size']);
+  final geometry =
+      raw['geometryValid'] == true &&
+      (_number(size['width']) - metrics.size.width).abs() < .5 &&
+      (_number(size['height']) - metrics.size.height).abs() < .5 &&
+      (_number(raw['pixelRatio']) - metrics.pixelRatio).abs() < .001;
+  final areaList = <ViewArea>[], foldList = <FoldInfo>[];
+  FoldableError? failure;
+  final DataState state;
+  if (!attached || raw['layoutRead'] != true || !geometry) {
+    state = available || !attached ? DataState.loading : DataState.notAvailable;
+  } else if (!available) {
+    state = DataState.notAvailable;
+  } else {
+    state = DataState.ready;
+    try {
+      for (final feature in raw['features'] as List) {
+        final m = wireMap(feature);
+        final id = m['id'] as String?;
+        final direction =
+            AreaDirection.values
+                .where((v) => v.name == m['direction'])
+                .firstOrNull ??
+            AreaDirection.unknown;
+        final openState = FoldState.values
+            .where((v) => v.name == m['openState'])
+            .firstOrNull;
+        areaList.add(
+          ViewArea(
+            id: id,
+            foldId: id,
+            type: m['type'] == 'hinge' ? AreaType.hinge : AreaType.fold,
+            rect: _rect(m['rect']),
+            isActive: true,
+            splitsView: m['splitsView'] as bool,
+            direction: direction,
+            cover: m['cover'] == 'full'
+                ? AreaCover.full
+                : m['cover'] == 'none'
+                ? AreaCover.none
+                : AreaCover.unknown,
+            source: DataSource.android,
+            nativeType: 'FoldingFeature',
+          ),
+        );
+        foldList.add(
+          FoldInfo(
+            id: id,
+            direction: direction,
+            openState: openState == null
+                ? DataValue.unknown(source: DataSource.android)
+                : ready(openState),
+            nativeState: m['nativeState'] as String?,
+          ),
+        );
+      }
+      // WindowManager reports folds. Flutter supplies cutouts separately.
+      areaList.addAll(
+        flutterData(
+          view,
+          false,
+        ).areas.value!.where((a) => a.nativeType == 'cutout'),
+      );
+    } catch (_) {
+      failure = const FoldableError(
+        ErrorCode.badData,
+        'Invalid Android fold measurements.',
+      );
+    }
+  }
+  DataValue<List<T>> group<T>(List<T> values) => failure != null
+      ? DataValue.error(failure, source: DataSource.android)
+      : state == DataState.ready
+      ? ready(values)
+      : state == DataState.loading
+      ? DataValue.loading(source: DataSource.android)
+      : DataValue.notAvailable(source: DataSource.android);
+  return FoldableData(
+    viewId: view.viewId,
+    sessionId: raw['sessionId'] as String,
+    revision: raw['revision'] as int,
+    viewState: !attached
+        ? ViewState.loading
+        : !available
+        ? ViewState.paused
+        : ViewState.ready,
+    view: DataValue.ready(metrics, source: DataSource.flutter, readAt: now),
+    isFoldable: raw['hasHingeSensor'] == true || raw['hasFoldFeature'] == true
+        ? ready(true)
+        : DataValue.unknown(source: DataSource.android),
+    areas: group(areaList),
+    folds: group(foldList),
+    ios: DataValue.notSupported(),
+    error: failure,
+  );
 }

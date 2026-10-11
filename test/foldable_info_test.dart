@@ -79,7 +79,7 @@ void main() {
     final angles = await FoldableInfo.readAngles();
     expect(angles.viewId, t.view.viewId);
     expect(angles.angles.state, DataState.notSupported);
-  });
+  }, variant: TargetPlatformVariant({TargetPlatform.linux}));
   testWidgets('invalid area group preserves valid view and hinge data', (
     t,
   ) async {
@@ -345,7 +345,7 @@ void main() {
     final resized = await handle.read();
     expect(resized.revision, first.revision + 1);
     expect((await handle.read()).revision, resized.revision);
-  });
+  }, variant: TargetPlatformVariant({TargetPlatform.linux}));
   testWidgets('native reads fail clearly and streams reject old snapshots', (
     t,
   ) async {
