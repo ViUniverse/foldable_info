@@ -168,17 +168,19 @@ enum ErrorCode {
   badVersion,
 }
 
+// A missing copyWith argument keeps its value; an explicit null clears it.
 const _keep = Object();
 
-bool _equal(Object? a, Object? b) {
-  if (a is List && b is List) {
-    return a.length == b.length &&
-        List.generate(a.length, (i) => _equal(a[i], b[i])).every((v) => v);
+bool _fieldEquals(Object? left, Object? right) {
+  if (left is List && right is List) {
+    return left.length == right.length &&
+        left.indexed.every((entry) => _fieldEquals(entry.$2, right[entry.$1]));
   }
-  return a == b;
+  return left == right;
 }
 
-int _hash(Object? v) => v is List ? Object.hashAll(v.map(_hash)) : v.hashCode;
+int _fieldHash(Object? v) =>
+    v is List ? Object.hashAll(v.map(_fieldHash)) : v.hashCode;
 
 /// Value equality shared by immutable measurement models.
 @immutable
@@ -192,9 +194,9 @@ abstract class InfoModel {
   bool operator ==(Object other) =>
       other.runtimeType == runtimeType &&
       other is InfoModel &&
-      _equal(fields, other.fields);
+      _fieldEquals(fields, other.fields);
   @override
-  int get hashCode => Object.hash(runtimeType, _hash(fields));
+  int get hashCode => Object.hash(runtimeType, _fieldHash(fields));
   @override
   String toString() => '$runtimeType(${fields.join(', ')})';
 }
@@ -291,42 +293,51 @@ class DataValue<T> extends InfoModel {
     Object? readAt = _keep,
     Object? error = _keep,
   }) {
-    final next = state ?? this.state;
-    final data = identical(value, _keep)
-        ? (next == DataState.ready ? this.value : null)
-        : value as T?;
-    final time = identical(readAt, _keep)
-        ? (next == DataState.ready ? this.readAt : null)
-        : readAt as DateTime?;
-    final failure = identical(error, _keep)
-        ? (next == DataState.error ? this.error : null)
-        : error as FoldableError?;
-    if (next == DataState.ready) {
-      if (data == null || time == null || failure != null) {
+    final nextState = state ?? this.state;
+    final nextValue = switch ((identical(value, _keep), nextState)) {
+      (true, DataState.ready) => this.value,
+      (true, _) => null,
+      (false, _) => value as T?,
+    };
+    final nextReadAt = switch ((identical(readAt, _keep), nextState)) {
+      (true, DataState.ready) => this.readAt,
+      (true, _) => null,
+      (false, _) => readAt as DateTime?,
+    };
+    final nextError = switch ((identical(error, _keep), nextState)) {
+      (true, DataState.error) => this.error,
+      (true, _) => null,
+      (false, _) => error as FoldableError?,
+    };
+    final nextSource = source ?? this.source;
+    if (nextState == DataState.ready) {
+      if (nextValue == null || nextReadAt == null || nextError != null) {
         throw ArgumentError('Ready data requires a value/time and no error.');
       }
-      return DataValue.ready(data, source: source ?? this.source, readAt: time);
+      return DataValue.ready(nextValue, source: nextSource, readAt: nextReadAt);
     }
-    if (data != null ||
-        time != null ||
-        (next == DataState.error ? failure == null : failure != null)) {
-      throw ArgumentError('Invalid fields for data state ${next.name}.');
+    final validError = switch (nextState) {
+      DataState.error => nextError != null,
+      _ => nextError == null,
+    };
+    if (nextValue != null || nextReadAt != null || !validError) {
+      throw ArgumentError('Invalid fields for data state ${nextState.name}.');
     }
-    return DataValue._(next, null, source ?? this.source, null, failure);
+    return DataValue._(nextState, null, nextSource, null, nextError);
   }
 
   @override
   List<Object?> get fields => [state, value, source, readAt, error];
 }
 
-DataValue<List<T>> _list<T>(DataValue<List<T>> v) => v.isReady
+DataValue<List<T>> _freezeList<T>(DataValue<List<T>> v) => v.isReady
     ? DataValue.ready(
         List<T>.unmodifiable(v.value!),
         source: v.source,
         readAt: v.readAt!,
       )
     : v;
-void _rect(Rect r) {
+void _validateRect(Rect r) {
   if (![r.left, r.top, r.width, r.height].every((v) => v.isFinite) ||
       r.width < 0 ||
       r.height < 0) {
@@ -334,7 +345,7 @@ void _rect(Rect r) {
   }
 }
 
-void _insets(EdgeInsets e) {
+void _validateInsets(EdgeInsets e) {
   if (![e.left, e.top, e.right, e.bottom].every((v) => v.isFinite && v >= 0)) {
     throw ArgumentError('Invalid insets');
   }
@@ -350,13 +361,13 @@ class ViewInfo extends InfoModel {
     required this.insets,
     required this.gestureInsets,
   }) {
-    _rect(Offset.zero & size);
+    _validateRect(Offset.zero & size);
     if (!pixelRatio.isFinite || pixelRatio <= 0) {
       throw ArgumentError('Invalid pixelRatio');
     }
-    _insets(padding);
-    _insets(insets);
-    _insets(gestureInsets);
+    _validateInsets(padding);
+    _validateInsets(insets);
+    _validateInsets(gestureInsets);
   }
 
   /// Size in Flutter logical pixels.
@@ -414,8 +425,8 @@ class ViewArea extends InfoModel {
     required this.source,
     this.nativeType,
   }) {
-    _rect(rect);
-    if (extraSpace != null) _insets(extraSpace!);
+    _validateRect(rect);
+    if (extraSpace != null) _validateInsets(extraSpace!);
   }
 
   /// Optional identifier, scoped to the current observation session.
@@ -570,7 +581,7 @@ class IosInfo extends InfoModel {
     required this.barSide,
     required this.safeArea,
   }) {
-    if (safeArea.isReady) _insets(safeArea.value!);
+    if (safeArea.isReady) _validateInsets(safeArea.value!);
   }
 
   /// UIKit horizontal size class.
@@ -615,8 +626,8 @@ class FoldableData extends InfoModel {
     required DataValue<List<FoldInfo>> folds,
     required this.ios,
     this.error,
-  }) : areas = _list(areas),
-       folds = _list(folds) {
+  }) : areas = _freezeList(areas),
+       folds = _freezeList(folds) {
     if (sessionId.isEmpty || revision < 0) {
       throw ArgumentError('Invalid session or counter');
     }
@@ -700,7 +711,7 @@ class FoldAngles extends InfoModel {
     required this.sequence,
     required DataValue<List<FoldAngle>> angles,
     this.error,
-  }) : angles = _list(angles) {
+  }) : angles = _freezeList(angles) {
     if (sessionId.isEmpty || sequence < 0) {
       throw ArgumentError('Invalid session or counter');
     }

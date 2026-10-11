@@ -1,7 +1,7 @@
 import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'models.dart';
-import 'service.dart' show viewInfo;
+import 'view_metrics.dart';
 
 /// Converts measured view areas into a widget's local coordinates.
 abstract final class FoldableSpace {
@@ -39,7 +39,8 @@ abstract final class FoldableSpace {
         data.viewState == ViewState.removed) {
       return result(LocalState.notAvailable);
     }
-    final current = viewInfo(view), measured = data.view.value;
+    final current = viewInfo(view);
+    final measured = data.view.value;
     if (measured == null ||
         measured.size != current.size ||
         measured.pixelRatio != current.pixelRatio) {
@@ -52,74 +53,99 @@ abstract final class FoldableSpace {
             : LocalState.notAvailable,
       );
     }
-    final matrix = target.getTransformTo(root), m = matrix.storage;
-    // Permit only translation and positive axis-aligned scale. Reject
-    // rotation, skew, reflection, perspective and transforms involving Z.
-    final zeros = [1, 2, 3, 4, 6, 7, 8, 9, 11, 14];
-    if (!m.every((v) => v.isFinite) ||
-        zeros.any((i) => m[i].abs() > 1e-9) ||
-        (m[10] - 1).abs() > 1e-9 ||
-        (m[15] - 1).abs() > 1e-9 ||
-        m[0] <= 0 ||
-        m[5] <= 0) {
-      return result(LocalState.badTransform);
-    }
-    final sx = m[0], sy = m[5], dx = m[12], dy = m[13];
-    final box = Offset.zero & target.size, areas = <ViewArea>[];
-    for (final a in data.areas.value!) {
-      final r = a.rect;
-      final local = Rect.fromLTRB(
-        (r.left - dx) / sx,
-        (r.top - dy) / sy,
-        (r.right - dx) / sx,
-        (r.bottom - dy) / sy,
-      );
-      final Rect clipped;
-      if (local.width == 0 && local.height > 0) {
-        if (local.left <= 0 ||
-            local.left >= box.right ||
-            local.bottom <= 0 ||
-            local.top >= box.bottom) {
-          continue;
-        }
-        clipped = Rect.fromLTRB(
-          local.left,
-          local.top.clamp(0, box.bottom),
-          local.right,
-          local.bottom.clamp(0, box.bottom),
-        );
-      } else if (local.height == 0 && local.width > 0) {
-        if (local.top <= 0 ||
-            local.top >= box.bottom ||
-            local.right <= 0 ||
-            local.left >= box.right) {
-          continue;
-        }
-        clipped = Rect.fromLTRB(
-          local.left.clamp(0, box.right),
-          local.top,
-          local.right.clamp(0, box.right),
-          local.bottom,
-        );
-      } else {
-        clipped = local.intersect(box);
-        if (clipped.isEmpty) continue;
-      }
-      final e = a.extraSpace;
-      areas.add(
-        a.copyWith(
-          rect: clipped,
-          extraSpace: e == null
-              ? null
-              : EdgeInsets.fromLTRB(
-                  e.left / sx,
-                  e.top / sy,
-                  e.right / sx,
-                  e.bottom / sy,
-                ),
-        ),
-      );
-    }
+    final transform = _readBoxTransform(target.getTransformTo(root).storage);
+    if (transform == null) return result(LocalState.badTransform);
+    final boxBounds = Offset.zero & target.size;
+    final areas = data.areas.value!
+        .map((area) => _toLocalArea(area, transform, boxBounds))
+        .nonNulls
+        .toList();
     return result(LocalState.ready, areas: areas);
   }
+}
+
+typedef _BoxTransform = ({
+  double scaleX,
+  double scaleY,
+  double offsetX,
+  double offsetY,
+});
+
+_BoxTransform? _readBoxTransform(List<double> matrix) {
+  // Matrix4 uses column-major storage. Only translation and positive 2D scale
+  // can preserve axis-aligned area frames without changing their meaning.
+  const zeroIndices = [1, 2, 3, 4, 6, 7, 8, 9, 11, 14];
+  const tolerance = 1e-9;
+  final valid =
+      matrix.every((value) => value.isFinite) &&
+      zeroIndices.every((index) => matrix[index].abs() <= tolerance) &&
+      (matrix[10] - 1).abs() <= tolerance &&
+      (matrix[15] - 1).abs() <= tolerance &&
+      matrix[0] > 0 &&
+      matrix[5] > 0;
+  if (!valid) return null;
+  return (
+    scaleX: matrix[0],
+    scaleY: matrix[5],
+    offsetX: matrix[12],
+    offsetY: matrix[13],
+  );
+}
+
+ViewArea? _toLocalArea(ViewArea area, _BoxTransform transform, Rect boxBounds) {
+  final localRect = Rect.fromLTRB(
+    (area.rect.left - transform.offsetX) / transform.scaleX,
+    (area.rect.top - transform.offsetY) / transform.scaleY,
+    (area.rect.right - transform.offsetX) / transform.scaleX,
+    (area.rect.bottom - transform.offsetY) / transform.scaleY,
+  );
+  final clipped = _clipArea(localRect, boxBounds);
+  if (clipped == null) return null;
+  return area.copyWith(
+    rect: clipped,
+    extraSpace: switch (area.extraSpace) {
+      final spacing? => EdgeInsets.fromLTRB(
+        spacing.left / transform.scaleX,
+        spacing.top / transform.scaleY,
+        spacing.right / transform.scaleX,
+        spacing.bottom / transform.scaleY,
+      ),
+      null => null,
+    },
+  );
+}
+
+Rect? _clipArea(Rect area, Rect boxBounds) {
+  // Rect.intersect drops empty rectangles. A zero-width/height fold is a useful
+  // dividing line, so clip those two cases before ordinary rectangles.
+  if (area.width == 0 && area.height > 0) {
+    if (area.left <= 0 ||
+        area.left >= boxBounds.right ||
+        area.bottom <= 0 ||
+        area.top >= boxBounds.bottom) {
+      return null;
+    }
+    return Rect.fromLTRB(
+      area.left,
+      area.top.clamp(0, boxBounds.bottom),
+      area.right,
+      area.bottom.clamp(0, boxBounds.bottom),
+    );
+  }
+  if (area.height == 0 && area.width > 0) {
+    if (area.top <= 0 ||
+        area.top >= boxBounds.bottom ||
+        area.right <= 0 ||
+        area.left >= boxBounds.right) {
+      return null;
+    }
+    return Rect.fromLTRB(
+      area.left.clamp(0, boxBounds.right),
+      area.top,
+      area.right.clamp(0, boxBounds.right),
+      area.bottom,
+    );
+  }
+  final clipped = area.intersect(boxBounds);
+  return clipped.isEmpty ? null : clipped;
 }

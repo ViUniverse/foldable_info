@@ -85,3 +85,20 @@ API 24–36 runtime behavior remain unverified. Android build checks are also ad
 to CI for Flutter 3.38.0 and stable; a configured job is not itself a passing
 result. The example toolchain intentionally remains on AGP/Gradle 8 for the
 minimum Flutter SDK; current Flutter reports future-support deprecation warnings.
+
+## Declarative Dart refactor
+
+The public API and Flutter 3.38 / Dart language 3.9 constraints are unchanged.
+`collection` 1.19.1 is now an explicit dependency. SDK `indexed`/`nonNulls` and
+collection lookup/equality helpers replace manual transformations where useful.
+
+All 22 existing plugin tests passed before and after restructuring. Four added
+regression tests cover ordered model equality/custom value identity, copyWith
+state invariants, snapshot comparison and horizontal/ordinary area clipping.
+A temporary differential check compared the previous and refactored decoders
+across 232 native availability/malformed-group combinations; all agreed. The
+previous implementation is not retained in the package. The example widget test,
+analysis and formatting also passed.
+
+After refactoring, Android flat/180° native integration and Duo iOS integration
+both passed (2 tests each). Live Android hot restart also passed.

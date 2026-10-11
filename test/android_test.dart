@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foldable_info/foldable_info.dart';
-import 'package:foldable_info/src/service.dart' show viewInfo;
+import 'package:foldable_info/src/view_metrics.dart';
 import 'package:foldable_info/src/wire.dart';
 
 Map<String, Object?> androidRaw(WidgetTester t) => {

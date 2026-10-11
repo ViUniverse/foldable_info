@@ -3,6 +3,8 @@ library;
 
 import 'dart:ui' as ui;
 import 'src/models.dart';
+import 'src/errors.dart';
+import 'src/replay_feed.dart';
 import 'src/service.dart';
 
 /// Injected measurement service with explicit per-view fixtures.

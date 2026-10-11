@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Refactor Dart decoding, streams and coordinate conversion into focused modules.
+  Use declarative collection transformations without changing the public API.
+
 - Add an Activity-aware native Android bridge using Jetpack WindowManager 1.5.1.
 - Read fold geometry, orientation, occlusion, separation and native posture.
 - Read/watch the default hinge-angle sensor independently on API 30+ when present.

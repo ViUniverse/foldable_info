@@ -18,3 +18,18 @@ Include the results and untested platforms in the pull request.
 
 Contributions are distributed under the project's MIT license. Do not copy code
 without compatible licensing and attribution.
+
+## Dart internals
+
+- `service.dart` selects a view; `foldable_view.dart` defines the public handle.
+- `native_view.dart` owns native subscriptions and Flutter lifecycle events.
+- `native_session.dart` rejects old sessions/counters; `replay_feed.dart` shares streams.
+- `wire.dart` selects the decoder; Android, iOS and angle decoders read their own payloads.
+- `view_metrics.dart` reads Flutter metrics; `flutter_data.dart` handles the fallback and cutouts.
+- `layout_comparison.dart` compares layout without observation times or counters.
+- `space.dart` converts/clips areas into a widget box; `models.dart` defines values.
+
+Prefer pure `map`/`where`/`nonNulls` transformations and `switch` mappings for data.
+Keep resource acquisition, cancellation and lifecycle steps explicit. Use Dart SDK
+or `collection` helpers where they make intent clearer. Preserve the Flutter 3.38
+minimum; avoid newer syntax that forces consumers to upgrade.
