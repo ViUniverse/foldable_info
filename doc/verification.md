@@ -212,3 +212,54 @@ the example widget test and formatting passed with Flutter 3.47.6. The Dart
 implementation was also checked on Flutter 3.41.2 as recorded above. Generated
 SwiftPM state and local CocoaPods setup are excluded from the release export.
 The standalone 0.3.0 iOS simulator debug build passed with Swift Package Manager.
+
+## P2 example recipes and comparison — 2026-11-10 (0.3.1)
+
+The [package comparison](comparison.md) uses exact published archive versions and
+SHA-256 values from the pub.dev registry. Seven competing packages were read at
+source/manifest level; none were built or run. Runtime and CI evidence for our
+published 0.3.0 is separate from the new example recipes in 0.3.1.
+
+The new recipe screen was run with Flutter 3.47.6 / Dart 3.13.5 on the iPhone Duo
+iOS 27.1 simulator and hot reloaded after fixes. With Live geometry selected:
+
+- List/detail retained Article 3 through closed → partial transitions.
+- The player changed from horizontal tabletop to vertical book layout while
+  remaining in the playing state and advancing to 17 seconds; Pause worked.
+- The bookmark action incremented its count; a primary-pane dialog moved to the
+  upper pane when the device rotated; Save returned a result to the page.
+- Selecting the secondary pane opened the sheet below the horizontal fold.
+- RTL and text 2× were visually inspected. The normal text and keyboard-capture
+  controls were restored after inspection.
+
+[Recipe screenshots and walkthrough](recipes.md) are actual simulator captures
+from those live layouts, not physical-device evidence. Runtime text entry via
+the desktop simulator controls was not established; draft entry/preservation and
+keyboard-inset handling were verified by widget tests instead.
+
+All **7 example tests** passed on Flutter 3.47.6 and in an isolated Flutter
+3.41.2 / Dart 3.11 checkout. The six new recipe tests cover splitting rules and
+zero-width lines, draft/selection through compact and expanded layouts, player
+controls/continuity, selected-pane dialog/sheet results and keyboard clearance,
+RTL with text 2× at 320 × 640 plus safe padding (including scrolling to a slider that stays outside the fold even in compact fallback), and an already-open editor
+through native-stream failure/recovery and changes in split orientation.
+Analysis passed for the package and the 3.41.2 example. The public library API,
+native bridges and platform minimums are unchanged by this P2 work.
+
+These recipes deliberately do not promise per-pane keyboard isolation, arbitrary
+transform support, every app's state retention policy, or physical-device/manual
+screen-reader certification. Pane sizes and responsive breakpoints are example
+policies. No new navigation scaffold or global display-feature bridge is added.
+
+The final P2 example web release build also passed, including the Wasm dry run.
+It retained the previously recorded optional Cupertino icon-font warning. Local
+Markdown document/image links were checked and had no missing targets.
+
+## 0.3.1 release preparation — 2026-11-10
+
+Rechecked from a clean standalone export with Flutter 3.47.6: analysis passed,
+32 package tests and 7 example tests passed, all 35 Dart files passed formatting,
+and the iOS simulator debug build passed with Swift Package Manager. Both package
+manifests are standalone; the workspace-only resolution and local CocoaPods
+configuration are not part of the release. The podspec version matches 0.3.1.
+The release adds example/recipe screenshots to the pub.dev gallery.

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:foldable_info/foldable_info.dart';
 import 'diagnostics.dart';
 import 'region_overlay.dart';
+import 'recipes/recipes_page.dart';
 
 void main() => runApp(const FoldableApp());
 
@@ -48,6 +49,15 @@ class _FoldablePageState extends State<FoldablePage> {
               appBar: AppBar(
                 title: const Text('Foldable info'),
                 actions: [
+                  IconButton(
+                    tooltip: 'Layout recipes',
+                    icon: const Icon(Icons.menu_book_outlined),
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => RecipesPage(info: widget.info),
+                      ),
+                    ),
+                  ),
                   IconButton(
                     tooltip: 'Toggle region overlay',
                     onPressed: () =>

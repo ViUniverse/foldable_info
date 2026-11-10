@@ -1,3 +1,11 @@
+## 0.3.1
+
+- Add runnable list/detail, tabletop player, floating controls and pane-local
+  dialog/sheet recipes to the example, with live/illustrative geometry, RTL and
+  large-text controls.
+- Add a dated package comparison with exact pub.dev versions, declared Dart/
+  Flutter constraints, source archive checksums and explicit evidence levels.
+
 ## 0.3.0
 
 - Add opt-in `FoldableSafeArea` for a single free rectangle around active

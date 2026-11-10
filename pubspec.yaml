@@ -1,6 +1,6 @@
 name: foldable_info
 description: Native fold geometry, hinge angles and reserved regions for iPhone Duo and Android foldables, with margins and a safe-area widget.
-version: 0.3.0
+version: 0.3.1
 homepage: https://github.com/ViUniverse/foldable_info
 repository: https://github.com/ViUniverse/foldable_info
 issue_tracker: https://github.com/ViUniverse/foldable_info/issues
@@ -11,6 +11,12 @@ screenshots:
     path: doc/images/duo-after.png
   - description: Native regions and margins on the iPhone Duo portrait view.
     path: doc/images/duo-portrait.png
+  - description: Live list and detail panes follow the fold in the example.
+    path: doc/images/recipe-list-detail.png
+  - description: Tabletop player recipe keeps the preview above the controls.
+    path: doc/images/recipe-tabletop.png
+  - description: A dialog stays inside its selected pane on iPhone Duo.
+    path: doc/images/recipe-dialog.png
 topics:
   - foldable
   - dual-screen

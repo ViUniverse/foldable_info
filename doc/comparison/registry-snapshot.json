@@ -1,0 +1,95 @@
+{
+  "reviewed_on": "2026-11-10",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "method": "Published manifests and source archives; competitors not built or run",
+  "packages": [
+    {
+      "package": "foldable_info",
+      "version": "0.3.0",
+      "published": "2026-11-10T02:14:24.090220Z",
+      "archive_sha256": "e80e0ae8738f0cdd40a26ccd48184a75045b70687163e8a5c8c4d75fc460464f",
+      "environment": {
+        "sdk": "^3.9.0",
+        "flutter": ">=3.38.0"
+      },
+      "archive_url": "https://pub.dev/api/archives/foldable_info-0.3.0.tar.gz"
+    },
+    {
+      "package": "foldable",
+      "version": "1.0.5",
+      "published": "2026-09-26T16:18:07.233001Z",
+      "archive_sha256": "c3f539ba3729716a5aacfcc4c3199d6ae0dee6e55f227d19ba25ef6fd96d804a",
+      "environment": {
+        "sdk": "^3.5.0",
+        "flutter": ">=3.24.0"
+      },
+      "archive_url": "https://pub.dev/api/archives/foldable-1.0.5.tar.gz"
+    },
+    {
+      "package": "unfold",
+      "version": "0.2.0",
+      "published": "2026-10-21T14:04:11.556114Z",
+      "archive_sha256": "0866dc1b191495e8aa9f94349a60bea25b4f5a28fd5ef888476aae70d709c937",
+      "environment": {
+        "sdk": "^3.12.0",
+        "flutter": ">=3.44.0"
+      },
+      "archive_url": "https://pub.dev/api/archives/unfold-0.2.0.tar.gz"
+    },
+    {
+      "package": "nitro_fold_duo",
+      "version": "0.0.1",
+      "published": "2026-09-21T13:35:29.744075Z",
+      "archive_sha256": "05279f14a74565796f72ed2791f6280e26a2d779896417cff67227a9d32875c7",
+      "environment": {
+        "sdk": "^3.13.3",
+        "flutter": ">=3.3.0"
+      },
+      "archive_url": "https://pub.dev/api/archives/nitro_fold_duo-0.0.1.tar.gz"
+    },
+    {
+      "package": "foldable_device",
+      "version": "1.0.5",
+      "published": "2026-11-04T07:02:41.038467Z",
+      "archive_sha256": "d0299303a566a21b1dff9d536c3e6fcca24821ce796e46563511bf13c3b9b748",
+      "environment": {
+        "sdk": ">=3.5.0 <4.0.0",
+        "flutter": ">=3.3.0"
+      },
+      "archive_url": "https://pub.dev/api/archives/foldable_device-1.0.5.tar.gz"
+    },
+    {
+      "package": "iphone_duo_ui_pro",
+      "version": "1.0.0",
+      "published": "2026-10-23T07:53:58.006223Z",
+      "archive_sha256": "1cab77054b188215926591eb83d56f26f30d5c127e9994db601faf5d1184d08b",
+      "environment": {
+        "sdk": "^3.10.0",
+        "flutter": ">=3.38.0"
+      },
+      "archive_url": "https://pub.dev/api/archives/iphone_duo_ui_pro-1.0.0.tar.gz"
+    },
+    {
+      "package": "duo_kit",
+      "version": "0.1.2",
+      "published": "2026-10-30T17:49:52.335887Z",
+      "archive_sha256": "290575a07cba8a08cf7cbd5aab7b2917c3bc922f6744dede17e8484146d8fd84",
+      "environment": {
+        "sdk": ">=3.11.0 <4.0.0",
+        "flutter": ">=3.41.0"
+      },
+      "archive_url": "https://pub.dev/api/archives/duo_kit-0.1.2.tar.gz"
+    },
+    {
+      "package": "duo_flex",
+      "version": "0.4.0",
+      "published": "2026-11-02T06:41:43.557993Z",
+      "archive_sha256": "29f799dfbb0f448ab94ea87f8a8cd72495f456a8fd6ef1de70e0dafb0e06a318",
+      "environment": {
+        "sdk": "^3.13.2",
+        "flutter": ">=3.47.2"
+      },
+      "archive_url": "https://pub.dev/api/archives/duo_flex-0.4.0.tar.gz"
+    }
+  ]
+}

@@ -28,6 +28,36 @@ largest free rectangle. Your app still chooses its navigation and pane layout.
 - Margins exposed as `extraSpace`; conversion into nested widget coordinates.
 - Opt-in `FoldableSafeArea`, shared streams, and an injectable fake for tests.
 
+## Recipes and package comparison
+
+The [runnable layout recipes](doc/recipes.md) cover list/detail, tabletop player,
+floating controls, dialogs and sheets, including RTL and large text. Open the
+example's **Layout recipes** button to try live or clearly labelled illustrative
+geometry. The recipes are included in the 0.3.1 example. They are example code, not new
+exported scaffold/navigation widgets.
+
+**Package snapshot: 2026-11-10.** The short comparison below is based on published
+source and manifests. Competitors were **not run** for this review. See the
+[full comparison, exact versions, SDK constraints and source evidence](doc/comparison.md).
+Native implementations remain conditional on OS and hardware capabilities.
+
+| Package / reviewed version | iOS / Android fold input | Separate margins field | Layout integration |
+| --- | --- | --- | --- |
+| [foldable_info 0.3.0](https://pub.dev/packages/foldable_info/versions/0.3.0) | Native / native + sensor | `extraSpace` | `FoldableSafeArea`, public widget-coordinate conversion |
+| [foldable 1.0.5](https://pub.dev/packages/foldable/versions/1.0.5) | Native / no native plugin | Not exposed | Builder and optional display-feature bridge |
+| [unfold 0.2.0](https://pub.dev/packages/unfold/versions/0.2.0) | Native / Flutter features | Yes | Occlusion avoidance, splits and navigation |
+| [nitro_fold_duo 0.0.1](https://pub.dev/packages/nitro_fold_duo/versions/0.0.1) | Native / native + sensor | Yes | Occlusion avoidance, splits and bar scaffold |
+| [foldable_device 1.0.5](https://pub.dev/packages/foldable_device/versions/1.0.5) | Native / native + sensor | Not exposed | `FoldSafeArea` and padding helper |
+| [iphone_duo_ui_pro 1.0.0](https://pub.dev/packages/iphone_duo_ui_pro/versions/1.0.0) | Native / no native plugin | Not exposed | Scaffold, panes, grid and route helpers |
+| [duo_kit 0.1.2](https://pub.dev/packages/duo_kit/versions/0.1.2) | External bridge / Flutter features | Not exposed | Scaffold, split view and route anchors |
+| [duo_flex 0.4.0](https://pub.dev/packages/duo_flex/versions/0.4.0) | Native / native + sensor | Not exposed | Responsive and posture-selection widgets |
+
+“Separate margins” concerns API metadata, not correctness of native frames:
+iOS reserved frames can already contain margins without a separate Dart field.
+The full table also distinguishes foldability evidence and general coordinate
+conversion from internal widget positioning. Likes/downloads are not used as
+correctness evidence.
+
 ## Install
 
 ```sh
