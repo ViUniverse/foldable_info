@@ -49,3 +49,23 @@ unsupported host transform must not be treated as valid local geometry.
 - [UITraitCollection](https://developer.apple.com/documentation/uikit/uitraitcollection)
 - [Flutter plugin development](https://docs.flutter.dev/packages-and-plugins/developing-packages)
 - [Flutter UIScene migration](https://docs.flutter.dev/release/breaking-changes/uiscenedelegate)
+
+## Host app setup and empty-region checklist
+
+For full iPhone Duo geometry, build the host app with the iOS 27.1 SDK (Xcode
+27.1); runtime selector guards let the plugin compile against older SDKs, but
+that does not opt an older-built app into the new full-window behavior. Keep
+the app's deployment target at 15 or later and adopt the UIScene lifecycle.
+See [Flutter UIScene migration](https://docs.flutter.dev/release/breaking-changes/uiscenedelegate).
+
+When the API is supported but regions are empty, check the host SDK, attached
+view, scene state and view overlap first. Check orientation/full-screen locks
+and compatibility-mode behavior in the host app. Test a fresh example bundle
+identifier before resetting a simulator with existing user data. A successful
+empty read does not identify a non-foldable device.
+
+`occlusion` means a reserved area covering content, not a camera classification.
+Camera, Dynamic Island and other system regions may coexist. Their reported
+frames can change independently of the hinge and safe area. The plugin preserves
+all queried regions and activity rather than using a single camera-sized rect.
+See [geometry contract](geometry.md) and [Apple's Duo layout guidance](https://developer.apple.com/design/human-interface-guidelines/designing-for-iphone-duo).

@@ -5,7 +5,7 @@ import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 EXCLUDED = {
-    '.git', '.dart_tool', 'build', 'coverage', '.DS_Store', '.idea',
+    '.git', '.swiftpm', '.dart_tool', 'build', 'coverage', '.DS_Store', '.idea',
     '.flutter-plugins-dependencies', '.pub-cache', '.pub', 'Pods', '.symlinks',
     '.gradle', '.cxx', '.kotlin', 'GeneratedPluginRegistrant.java', 'local.properties', 'gradlew', 'gradlew.bat', 'gradle-wrapper.jar',
     'ephemeral', 'pubspec.lock', 'pubspec_overrides.yaml', '__pycache__',

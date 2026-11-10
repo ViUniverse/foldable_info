@@ -1,3 +1,11 @@
+## 0.3.0
+
+- Add opt-in `FoldableSafeArea` for a single free rectangle around active
+  occlusions/hinge gaps, with widget-local geometry and SafeArea integration.
+- Add a full-view example geometry overlay and copyable diagnostic snapshots.
+- Document margins/frame semantics, evidence-based device support, iPhone Duo
+  setup, and visual usage examples.
+
 ## 0.2.0
 
 - Fix `FoldableSpace.toBox` on high-density screens: omit RenderView's physical

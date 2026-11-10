@@ -100,6 +100,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
     }
     expect(find.text('View: ready'), findsOneWidget);
+    await tester.ensureVisible(find.byType(Switch));
     await tester.tap(find.byType(Switch));
     for (var i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 100));

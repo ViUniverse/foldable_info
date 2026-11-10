@@ -1,0 +1,111 @@
+{
+  "capturedAt": "2026-11-10T01:45:53.607316Z",
+  "sessionId": "70797BD5-B70B-48D1-8CBB-A8B64915C8FC",
+  "revision": 1,
+  "viewId": 0,
+  "viewState": "ready",
+  "units": "logicalPixels",
+  "frameIncludesMarginsOnIos": true,
+  "view": {
+    "state": "ready",
+    "size": [
+      466.0,
+      678.0
+    ],
+    "pixelRatio": 3.0,
+    "padding": [
+      0.0,
+      0.0,
+      84.0,
+      34.0
+    ],
+    "keyboardInsets": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gestureInsets": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "isFoldable": {
+    "state": "ready",
+    "value": true
+  },
+  "areasState": "ready",
+  "areasReadAt": "2026-11-10T01:45:42.789948Z",
+  "areas": [
+    {
+      "id": "2C0414C8-DA42-428F-948A-2782319015D3",
+      "type": "blocked",
+      "nativeType": "occlusion",
+      "source": "ios",
+      "rectXYWH": [
+        399.6666666666667,
+        29.333333333333332,
+        37.0,
+        37.0
+      ],
+      "marginsLTRB": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "active": true,
+      "splitsView": null,
+      "cover": "unknown",
+      "direction": "unknown",
+      "foldId": null
+    },
+    {
+      "id": "174F341F-22E6-4932-8631-6DA4DE6E9219",
+      "type": "blocked",
+      "nativeType": "occlusion",
+      "source": "ios",
+      "rectXYWH": [
+        382.0,
+        0.0,
+        84.0,
+        170.0
+      ],
+      "marginsLTRB": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "active": true,
+      "splitsView": null,
+      "cover": "unknown",
+      "direction": "unknown",
+      "foldId": null
+    }
+  ],
+  "foldsState": "ready",
+  "folds": [
+    {
+      "id": null,
+      "state": "ready",
+      "posture": "closed",
+      "nativeState": "1"
+    }
+  ],
+  "iosState": "ready",
+  "ios": {
+    "barSide": "end",
+    "barSideState": "ready",
+    "widthClass": "compact",
+    "heightClass": "regular",
+    "safeArea": [
+      0.0,
+      0.0,
+      84.0,
+      34.0
+    ]
+  }
+}

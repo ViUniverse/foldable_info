@@ -1,14 +1,32 @@
 # foldable_info
 
-Read fold state, hinge angle, view size and blocked areas in Flutter. Your app
-or design system decides how to arrange content; this package supplies data.
+Native fold geometry for **iPhone Duo and Android foldables**: fold posture,
+hinge angles, reserved regions and margins, plus a small widget to keep controls
+clear of obstacles. Flutter 3.38+. No provider or design-system dependency.
 
-**Version 0.2.0 adds native Android support.** Android reads Jetpack
-WindowManager fold features and the hinge-angle sensor when present. The iOS
-bridge reads public UIKit APIs when available. Web and desktop use Flutter view
-metrics and display features. Version 0.1.1 was iOS-first.
-The new Apple hinge/reserved-region APIs are currently documented as beta and
-may change. Missing data is reported explicitly, not guessed.
+![iPhone Duo closed, partly open and flat simulator captures](doc/images/duo-poses.gif)
+
+Actual iPhone Duo / iOS 27.1 simulator captures: closed → partly open landscape
+→ flat portrait. This is a sequence of measured poses, not a hardware recording.
+
+| Avoidance off: control crosses the fold | Avoidance on: control stays in a free region |
+| --- | --- |
+| ![Before avoidance](doc/images/duo-before.png) | ![After avoidance](doc/images/duo-after.png) |
+
+![Fold, occlusion and margins explained](doc/images/geometry.png)
+
+Orange regions cover content; purple regions divide it. iOS frames **already
+include margins**. `FoldableSafeArea` uses those frames to keep its child in the
+largest free rectangle. Your app still chooses its navigation and pane layout.
+
+## Why foldable_info?
+
+- Native UIKit reserved regions and Jetpack WindowManager folds; Android hinge
+  sensor readings when available, separate from layout updates.
+- `isFoldable` with explicit availability: missing evidence stays `unknown`.
+- Distinct `fold`, `hinge` and `blocked` regions, including inactive regions.
+- Margins exposed as `extraSpace`; conversion into nested widget coordinates.
+- Opt-in `FoldableSafeArea`, shared streams, and an injectable fake for tests.
 
 ## Install
 
@@ -19,6 +37,43 @@ flutter pub add foldable_info
 Flutter 3.38+ is required. The Dart language minimum is 3.9, so the Dart 3.10
 beta bundled with Flutter 3.38.0 is also accepted. iOS deployment target: 15.0+. New fold APIs need a supporting OS and device/view hierarchy.
 There are no extra permissions, provider dependency or design-system dependency.
+
+## Keep a control clear of reserved regions
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:foldable_info/foldable_info.dart';
+
+// Place in a bounded box, e.g. Scaffold.body or Expanded.
+StreamBuilder<FoldableData>(
+  stream: FoldableInfo.watch(),
+  builder: (context, snapshot) {
+    final data = snapshot.data;
+    if (snapshot.hasError) return const Text('Could not read geometry');
+    if (data == null) return const SizedBox.shrink();
+    return FoldableSafeArea(
+      data: data,
+      child: Align(
+        alignment: Alignment.topRight,
+        child: FilledButton(onPressed: () {}, child: const Text('Action')),
+      ),
+    );
+  },
+)
+```
+
+The widget applies Flutter `SafeArea` first, then avoids intersecting `blocked`
+and `hinge` frames. It ignores explicitly inactive regions. Add `AreaType.fold`
+to `avoid` to keep the whole child on one side of a fold. It chooses one largest
+free rectangle, so a small corner obstacle can reserve an entire strip. It does
+not split the child into panes. Equal choices prefer top, then leading side.
+
+Use `useSafeArea: false` for an intentional edge-to-edge region. Ancestor
+`SafeArea` padding is consumed normally and is not added twice. Geometry is
+measured after layout; the child appears on the following frame. Moving
+ancestors are remeasured after each rendered frame. Unavailable/stale data or an
+unsupported transform falls back to Flutter safe padding alone; that fallback
+cannot guarantee avoidance of an unreported obstacle. See [geometry rules](doc/geometry.md).
 
 ## Read once
 
@@ -83,7 +138,7 @@ StreamBuilder<FoldableData>(
 
 Import `package:flutter/material.dart` for this widget example. The stream for
 a live handle is stable across calls, so a rebuild does not restart it. The
-package does not provide UI providers or builders. Provider, Riverpod, Bloc or
+package does not require a state-management provider. Provider, Riverpod, Bloc or
 your design system can consume the same streams.
 
 ## Read the angle separately
@@ -122,6 +177,14 @@ snapshots are immutable. Read failures complete the Future with `FoldableError`;
 stream failures also reach `onError`. A successful later measurement can recover.
 Default read timeout: 5 seconds. Invalid timeouts throw `ArgumentError`.
 
+Read foldability explicitly; `null` below means the evidence cannot answer yet:
+
+```dart
+final data = await FoldableInfo.read();
+final bool? foldable = data.isFoldable.value; // true / false / unknown (null)
+// Inspect data.isFoldable.state to distinguish loading/unknown/unsupported.
+```
+
 An empty area list does **not** prove the device cannot fold. `isFoldable` remains
 unknown without evidence. `ViewArea.isActive` says whether that reserved area is
 active; it does not identify which physical screen is powered on. Fold state and
@@ -150,7 +213,29 @@ another view and changed size/pixel ratio. Call again after layout or a new data
 snapshot. iOS reserved frames already include the reported margins; do not add
 `extraSpace` again to those frames. It is metadata, scaled during conversion.
 
-## Platform support
+## Device support
+
+**Native API support is different from tested hardware.** The matrix below
+records simulator/emulator evidence from [verification](doc/verification.md);
+it does not certify physical devices. Detection follows OS capabilities, never
+a hard-coded model-name list.
+
+| Device / family | Geometry and posture | Angle | Evidence / limitations |
+| --- | --- | --- | --- |
+| **iPhone Duo** | UIKit reserved occlusion/division regions, margins, activity, hinge status and bar-side hints when exposed | UIKit hinge | iOS 27.1 simulator: closed, partial and flat poses; physical device unverified. Build host app with the iOS 27.1 SDK for full Duo geometry. |
+| **Pixel 10 Pro Fold** | Native WindowManager fold, separating/occlusion properties; cover cutout via Flutter | Sensor when present | API 37 emulator: half-open, flat and foreground cover-display transitions. Physical device unverified. |
+| Galaxy Z Fold / Z Flip, other Pixel Fold | Same Android APIs when supplied by vendor | Requires API 30+ and sensor | API-based support; these models not individually verified. |
+| Microsoft Surface Duo / Duo 2 | WindowManager hinge gap and separating geometry when exposed | Not guaranteed | API-based support; hardware/emulator not individually verified. Surface Duo is distinct from iPhone Duo. |
+| Ordinary iPhone / iPad | View metrics, safe area and size classes; reserved regions only if OS/view exposes them | Usually unavailable | iPhone 18 Pro iOS 27.0 and iPad iOS 26.2 simulator fallback checks recorded. No fold data does not prove hardware incapable. |
+| Ordinary Android phones | View metrics and Flutter cutouts | Usually unavailable | Pixel 7 emulator consumer check recorded. |
+| Web, macOS, Windows, Linux | Flutter metrics/display-feature fallback | Unsupported | No native fold-hardware detection; do not interpret empty features as `isFoldable == false`. |
+
+Minimum iOS deployment target is 15; newer fold APIs need a supporting runtime,
+device and view hierarchy. Older systems retain supported metrics and report
+unsupported fold fields explicitly. Read [iOS setup and troubleshooting](doc/native-ios.md)
+for SDK, scene lifecycle and empty-region checks.
+
+## Platform data
 
 | Data | iOS | Android | Web / desktop |
 | --- | --- | --- | --- |
@@ -180,7 +265,8 @@ classes and safe area. Resolve `BarSide.start/end` using your widget's
 - Android observes the default hinge sensor, without assigning it to a fold ID.
   Angle-only changes do not alter layout state; sensor precision and availability
   depend on the device.
-- No layout placement, navigation, overflow decisions or animation.
+- `FoldableSafeArea` places content in one free rectangle. No navigation,
+  two-pane composition, overflow decisions or animation.
 - Minimum-version declarations are not a complete tested device/SDK matrix.
   See [verified coverage](doc/verification.md) and [iOS details](doc/native-ios.md) and [Android details](doc/native-android.md).
 
@@ -191,7 +277,8 @@ fixtures keyed by view ID, call `fake.forView(view)` and use `sendData`,
 `sendAngles` or `sendError`. Counters must advance within a session. Call
 `dispose()` when finished; no global service replacement is needed.
 
-The [example](example/README.md) uses only Flutter and this plugin, including
+The [example](example/README.md) includes a live region overlay and a copyable
+geometry snapshot for bug reports. It uses only Flutter and this plugin, including
 angle subscription lifetime and keyboard metrics. In a standalone checkout:
 
 ```sh

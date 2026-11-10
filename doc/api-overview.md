@@ -45,6 +45,12 @@ classDiagram
   class FoldableSpace {
     +toBox(data, target, view) LocalAreas
   }
+  class FoldableSafeArea {
+    +data FoldableData
+    +child Widget
+    +avoid Set~AreaType~
+    +useSafeArea bool
+  }
   class FakeFoldableInfo {
     +sendData(data)
     +sendAngles(sample)
@@ -57,6 +63,8 @@ classDiagram
   FoldableData ..> DataValue : availability per group
   FoldAngles ..> DataValue : availability
   FoldableSpace ..> FoldableData : converts areas after layout
+  FoldableSafeArea ..> FoldableSpace : measures its bounded box
+  FoldableSafeArea ..> FoldableData : avoids selected active areas
   FoldableInfo <|-- FakeFoldableInfo
 ```
 
@@ -83,3 +91,8 @@ Check DataValue.state before using a value. Unknown, unavailable, unsupported an
 an empty ready list describe different things. Timestamps and identifiers are
 observations, not persistent device identifiers. Snapshot lists are immutable;
 keep any custom DataValue value immutable too.
+
+`FoldableSafeArea` is optional and owns no service subscription. Feed it snapshots
+from any state-management approach. It applies Flutter safe padding, converts
+regions after layout, and places the child in one largest free rectangle.
+See [geometry contract](geometry.md) for fallback, frame timing and transform limits.

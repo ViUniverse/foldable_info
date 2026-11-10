@@ -1,0 +1,134 @@
+{
+  "capturedAt": "2026-11-10T01:46:17.704899Z",
+  "sessionId": "70797BD5-B70B-48D1-8CBB-A8B64915C8FC",
+  "revision": 9,
+  "viewId": 0,
+  "viewState": "ready",
+  "units": "logicalPixels",
+  "frameIncludesMarginsOnIos": true,
+  "view": {
+    "state": "ready",
+    "size": [
+      951.0,
+      669.0
+    ],
+    "pixelRatio": 3.0,
+    "padding": [
+      0.0,
+      0.0,
+      84.0,
+      34.0
+    ],
+    "keyboardInsets": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gestureInsets": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "isFoldable": {
+    "state": "ready",
+    "value": true
+  },
+  "areasState": "ready",
+  "areasReadAt": "2026-11-10T01:46:11.658572Z",
+  "areas": [
+    {
+      "id": "AA6113F1-84A5-45E3-9D00-8C8FB93C3BC8",
+      "type": "blocked",
+      "nativeType": "occlusion",
+      "source": "ios",
+      "rectXYWH": [
+        677.3333333333334,
+        21.0,
+        58.0,
+        37.0
+      ],
+      "marginsLTRB": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "active": false,
+      "splitsView": null,
+      "cover": "unknown",
+      "direction": "unknown",
+      "foldId": null
+    },
+    {
+      "id": "174F341F-22E6-4932-8631-6DA4DE6E9219",
+      "type": "blocked",
+      "nativeType": "occlusion",
+      "source": "ios",
+      "rectXYWH": [
+        867.0,
+        0.0,
+        84.0,
+        120.0
+      ],
+      "marginsLTRB": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "active": true,
+      "splitsView": null,
+      "cover": "unknown",
+      "direction": "unknown",
+      "foldId": null
+    },
+    {
+      "id": "30DE9925-24F0-4040-8C02-27E8CAE51F3D",
+      "type": "fold",
+      "nativeType": "division",
+      "source": "ios",
+      "rectXYWH": [
+        455.5,
+        0.0,
+        40.0,
+        669.0
+      ],
+      "marginsLTRB": [
+        20.0,
+        0.0,
+        20.0,
+        0.0
+      ],
+      "active": true,
+      "splitsView": null,
+      "cover": "unknown",
+      "direction": "topToBottom",
+      "foldId": null
+    }
+  ],
+  "foldsState": "ready",
+  "folds": [
+    {
+      "id": null,
+      "state": "ready",
+      "posture": "partlyOpen",
+      "nativeState": "2"
+    }
+  ],
+  "iosState": "ready",
+  "ios": {
+    "barSide": "end",
+    "barSideState": "ready",
+    "widthClass": "regular",
+    "heightClass": "regular",
+    "safeArea": [
+      0.0,
+      0.0,
+      84.0,
+      34.0
+    ]
+  }
+}

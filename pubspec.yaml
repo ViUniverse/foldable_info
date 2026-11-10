@@ -1,14 +1,22 @@
 name: foldable_info
-description: Fold, angle and view information for Flutter through direct reads and streams.
-version: 0.2.0
+description: Native fold geometry, hinge angles and reserved regions for iPhone Duo and Android foldables, with margins and a safe-area widget.
+version: 0.3.0
 homepage: https://github.com/ViUniverse/foldable_info
 repository: https://github.com/ViUniverse/foldable_info
 issue_tracker: https://github.com/ViUniverse/foldable_info/issues
+screenshots:
+  - description: A control crossing the iPhone Duo fold with avoidance disabled.
+    path: doc/images/duo-before.png
+  - description: FoldableSafeArea moves the control into the largest free region.
+    path: doc/images/duo-after.png
+  - description: Native regions and margins on the iPhone Duo portrait view.
+    path: doc/images/duo-portrait.png
 topics:
   - foldable
   - dual-screen
   - hinge
   - adaptive-ui
+  - iphone-duo
 platforms:
   android:
   ios:

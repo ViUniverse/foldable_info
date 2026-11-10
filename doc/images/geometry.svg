@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="520" viewBox="0 0 1120 520">
+<rect width="1120" height="520" rx="24" fill="#f3f5fa"/>
+<g font-family="Arial, sans-serif" fill="#17213b">
+<text x="40" y="49" font-size="27" font-weight="bold">See the regions. Keep controls clear.</text>
+<text x="40" y="79" font-size="16">Schematic · logical pixels · illustrative geometry, not a device measurement</text>
+<rect x="40" y="106" width="480" height="300" rx="20" fill="white" stroke="#a6afc4" stroke-width="2"/>
+<rect x="260" y="107" width="40" height="298" fill="#e5d5ff" stroke="#7c3aed" stroke-width="2"/>
+<path d="M280 108V404" stroke="#7c3aed" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="436" y="107" width="83" height="170" fill="#ffdfc7" stroke="#d64d0c" stroke-width="2"/>
+<rect x="452" y="127" width="51" height="138" rx="19" fill="#fd9b63"/>
+<text x="63" y="140" font-size="16" fill="#68738a">View origin (0, 0)</text>
+<rect x="70" y="314" width="150" height="48" rx="12" fill="#2456d5"/>
+<text x="94" y="344" font-size="17" fill="white">Safe control</text>
+<text x="231" y="436" font-size="16" fill="#7c3aed">fold / division</text>
+<path d="M280 406V418" stroke="#7c3aed"/>
+<g font-size="17">
+<text x="570" y="133" font-size="20" font-weight="bold">What the package reports</text>
+<rect x="572" y="158" width="18" height="18" fill="#ffdfc7" stroke="#d64d0c"/>
+<text x="605" y="174">blocked / occlusion: avoid interactive content</text>
+<rect x="572" y="199" width="18" height="18" fill="#e5d5ff" stroke="#7c3aed"/>
+<text x="605" y="215">fold or hinge: division / physical gap</text>
+<text x="572" y="260">rect = reported frame, including iOS margins</text>
+<text x="572" y="293">extraSpace = native margins metadata</text>
+<text x="572" y="326">isActive = whether the region affects the view</text>
+<text x="572" y="359">SafeArea padding is a separate measurement</text>
+<text x="572" y="403" font-weight="bold">Do not add margins to the iOS frame again.</text>
+</g>
+<text x="40" y="482" font-size="17">foldable_info · native iOS + Android · explicit availability · widget coordinate conversion</text>
+</g></svg>

@@ -152,3 +152,63 @@ newer Android Studio Java does not imply that the example's Gradle 8 supports
 that Java version. Earlier minimum-Flutter CI results concern the iOS-first
 release; the Android matrix is configured for this release and its actual
 outcome must be read from the release commit's CI run.
+
+## Avoidance widget and documentation update — 2026-11-10
+
+The example was run on the existing iPhone Duo iOS 27.1 simulator with Flutter
+3.47.6 / Dart 3.13.5 / Xcode 27.1 from a standalone export. It was hot restarted
+after UI changes. Closed, partial landscape, partial portrait and flat portrait
+snapshots, including all inactive regions and margins, are stored in
+[the measurement record](measurements/2026-11-10/README.md). README images are
+actual simulator captures, except the explicitly labelled geometry schematic.
+The GIF is a sequence of captures, not a continuous hardware recording.
+
+The before/after demo was inspected on the simulator: with avoidance off, the
+control crossed the vertical fold; with it on, the control stayed in the
+largest free rectangle on the left. Tapping it through the enabled overlay
+produced the expected confirmation. The example's outer SafeArea keeps its
+diagnostic buttons outside the status column.
+
+The customer-specific 144-wide region was not reproduced: this run reported
+134 × 82 in portrait, 84 × 120 on the inner landscape view, and 84 × 170 closed.
+Occlusion margins were zero. No fixed-width padding or native semantic subtype
+was introduced. Physical device behavior and arbitrary status contents remain
+unverified. API geometry can briefly lag rotation; see the measurement record.
+
+Flutter 3.41.2 / Dart 3.11 was downloaded from the official Flutter tag for an
+isolated compatibility check, rather than resolving the full ViAce workspace
+(which has unrelated dependencies requiring newer Dart). This release keeps
+Flutter 3.38 as its declared minimum. The CI Dart matrix now also includes
+3.41.2; a configured job is not itself a passing CI result.
+
+| Current check | Result |
+| --- | --- |
+| Workspace package analysis, Flutter 3.47.6 | No issues |
+| Package tests, Flutter 3.47.6 | 32 passed |
+| Example widget test | Passed; loading, error/recovery, angle lifetime, overlay toggle and copied diagnostic JSON |
+| Standalone analysis and 32 package tests, Flutter 3.41.2 | Passed |
+| Standalone example widget test, Flutter 3.41.2 | Passed |
+| Duo iOS 27.1 native integration, current example | 2 passed; closed 0°, separate 37 × 37 and 84 × 170 blocked regions |
+| iPhone 18 Pro iOS 27.0 native integration, current example | 2 passed; fold/region/angle fields unsupported, metrics and example remain usable |
+
+Five new widget tests cover single/multiple overlapping obstacles, zero-width
+folds, inactive regions, margins without reinflation, nested SafeArea/offsets,
+ancestor movement without a new snapshot, RTL ties, complete coverage, missing
+data fallback and button taps. Existing coordinate tests cover DPR and scale.
+Native Android was not rerun for this Dart/widget/documentation update; previous
+Android emulator evidence above remains explicitly dated.
+
+Final formatting checked 29 Dart files with no changes; `git diff --check`
+passed. Standalone publication dry run reported 0 warnings (about 2 MB archive)
+with README images and pub.dev screenshot metadata included. No publication was
+performed. Local Markdown image/document links were checked for missing files.
+The final example was relaunched and hot reloaded on Duo after the native suites.
+
+## 0.3.0 release preparation — 2026-11-10
+
+The standalone release keeps workspace resolution out of both manifests and
+uses the example's local path dependency. Dart analysis, all 32 package tests,
+the example widget test and formatting passed with Flutter 3.47.6. The Dart
+implementation was also checked on Flutter 3.41.2 as recorded above. Generated
+SwiftPM state and local CocoaPods setup are excluded from the release export.
+The standalone 0.3.0 iOS simulator debug build passed with Swift Package Manager.
