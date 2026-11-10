@@ -64,7 +64,18 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter build apk --debug
+      - run: flutter build apk --debug 2>&1 | tee android-build.log
+        id: android_build
         working-directory: example
+      - name: Report Android build failure
+        if: failure() && steps.android_build.outcome == 'failure'
+        working-directory: example
+        run: |
+          python3 - <<'PYTHON'
+          from pathlib import Path
+          text = '\n'.join(Path('android-build.log').read_text().splitlines()[-80:])
+          text = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+          print('::error title=Android build output::' + text)
+          PYTHON
       - run: ./gradlew :foldable_info:testDebugUnitTest
         working-directory: example/android
