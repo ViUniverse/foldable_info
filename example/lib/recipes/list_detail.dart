@@ -80,6 +80,7 @@ class _ListDetailRecipeState extends State<ListDetailRecipe> {
                   Align(
                     alignment: AlignmentDirectional.centerStart,
                     child: TextButton.icon(
+                      key: const ValueKey('recipe-back-to-list'),
                       onPressed: () {
                         FocusManager.instance.primaryFocus?.unfocus();
                         setState(() => _selected = null);

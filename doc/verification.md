@@ -263,3 +263,8 @@ and the iOS simulator debug build passed with Swift Package Manager. Both packag
 manifests are standalone; the workspace-only resolution and local CocoaPods
 configuration are not part of the release. The podspec version matches 0.3.1.
 The release adds example/recipe screenshots to the pub.dev gallery.
+
+The 3.38.0 example suite was rerun locally and all 7 tests passed. The compact
+back-button test uses a stable key because older Flutter versions implement
+`TextButton.icon` with a different concrete widget type. This corrects the test
+lookup while preserving its navigation and draft-retention assertions.

@@ -85,7 +85,7 @@ void main() {
       await t.pumpAndSettle();
       expect(find.text('Article 3 details'), findsOneWidget);
       expect(find.text('Keep this draft'), findsOneWidget);
-      await t.tap(find.widgetWithText(TextButton, 'Reading list'));
+      await t.tap(find.byKey(const ValueKey('recipe-back-to-list')));
       await t.pumpAndSettle();
       expect(find.text('Article 3'), findsOneWidget);
       expect(t.takeException(), isNull);
